@@ -1,0 +1,227 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+	id 'com.jfrog.artifactory' version '4.0.0'
+	id 'com.jfrog.bintray' version '1.5'
+}
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+group = 'org.jruyi'
+archivesBaseName = 'jruyi-api'
+version = '2.5.0-SNAPSHOT'
+description = 'An API lib for developing JRuyi based applications'
+
+ext {
+	title = 'JRuyi API'
+
+	organizationId = 'org.jruyi'
+	organizationName = 'JRuyi.org'
+	organizationUrl = 'http://www.jruyi.org/'
+
+	websiteUrl = 'https://github.com/jruyi/jruyi-api'
+	issueTrackerUrl = 'https://github.com/jruyi/jruyi-api/issues'
+	vcsUrl = 'https://github.com/jruyi/jruyi-api.git'
+
+	licenseName = 'Apache License, Version 2.0'
+	licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+
+	createdBy = "${System.getProperty('java.version')} (${System.getProperty('java.vm.vendor')})"
+}
+
+repositories {
+	jcenter()
+}
+
+configurations.all {
+	transitive = false
+}
+
+dependencies {
+	compile "org.osgi:org.osgi.core:4.3.1"
+}
+
+processResources {
+	expand([
+			org_jruyi_system_version: '2.0',
+			org_jruyi_cmd_version   : '2.0',
+			org_jruyi_common_version: '2.4',
+			org_jruyi_io_version    : '2.5',
+			org_jruyi_tpe_version   : '2.0',
+
+			org_jruyi_core_version  : '2.5',
+	])
+}
+
+compileJava {
+	sourceCompatibility = 1.7
+	targetCompatibility = 1.7
+	options.encoding = 'UTF-8'
+}
+
+compileTestJava {
+	sourceCompatibility = 1.7
+	targetCompatibility = 1.7
+	options.encoding = 'UTF-8'
+}
+
+processResources {
+	from(['LICENSE', 'NOTICE']) {
+		into 'META-INF'
+	}
+}
+
+javadoc {
+	title = "${project.title} $version"
+	options {
+		encoding = 'UTF-8'
+		bottom = "Copyright &copy; ${Calendar.instance.get(Calendar.YEAR)} " +
+				"<a href=\"$organizationUrl\">$organizationName</a>. " +
+				"All rights reserved."
+	}
+
+	exclude 'org/jruyi/system/main/**'
+	exclude '**/internal/**'
+}
+
+jar {
+	from sourceSets.main.output
+	exclude('**/internal/**')
+
+	manifest {
+		attributes(
+				'Specification-Title': title,
+				'Specification-Version': version,
+				'Specification-Vendor': organizationName,
+				'Specification-Vendor-Id': organizationId,
+				'Implementation-Title': title,
+				'Implementation-Version': version,
+				'Implementation-Vendor': organizationName,
+				'Created-By': createdBy,
+		)
+	}
+}
+
+task sourcesJar(type: Jar) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+
+			artifactId archivesBaseName
+
+			from components.java
+
+			pom.withXml {
+				def node = asNode()
+				node.children().last() + {
+					resolveStrategy = Closure.DELEGATE_FIRST
+					name title
+					description description
+					url websiteUrl
+					inceptionYear '2011'
+					scm {
+						url websiteUrl
+						connection "scm:$vcsUrl"
+						developerConnection "scm:$vcsUrl"
+					}
+					licenses {
+						license {
+							name licenseName
+							url licenseUrl
+							distribution 'repo'
+						}
+					}
+					developers {
+						developer {
+							id 'agemocui'
+							name 'Agemo Cui'
+							email 'agemocui@jruyi.org'
+						}
+					}
+				}
+
+				node.dependencies.'*'.findAll() {
+					it.scope.text() == 'runtime'
+				}.each() {
+					it.scope*.value = 'provided'
+				}
+			}
+
+			artifact sourcesJar
+			artifact javadocJar
+		}
+	}
+}
+
+artifactory {
+	contextUrl = 'https://oss.jfrog.org/artifactory'
+	publish {
+		repository {
+			repoKey = "oss-snapshot-local"
+			username = bintrayUser
+			password = bintrayApiKey
+		}
+	}
+	resolve {
+		repository {
+			repoKey = "libs-snapshot"
+		}
+	}
+}
+
+artifactoryPublish {
+	publications ('mavenJava')
+}
+
+bintray {
+	user = bintrayUser
+	key = bintrayApiKey
+	publications = ['mavenJava']
+	publish = true
+	pkg {
+		repo = 'maven'
+		userOrg = 'jruyi'
+		name = archivesBaseName
+		desc = description
+		websiteUrl = websiteUrl
+		issueTrackerUrl = issueTrackerUrl
+		vcsUrl = vcsUrl
+		licenses = ['Apache-2.0']
+		labels = ['jruyi', 'api']
+		publicDownloadNumbers = true
+		version {
+			name = project.version
+			vcsTag = "v${project.version}"
+		}
+	}
+}
+
+task (checkUploadTask) << {
+	def file = new File("$buildDir/.upload-task")
+	if (project.version.endsWith('-SNAPSHOT'))
+		file << 'artifactoryPublish'
+	else
+		file << 'bintrayUpload'
+}
