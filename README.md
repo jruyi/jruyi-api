@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.jruyi:jruyi-api:2.4.0'
+    compile 'org.jruyi:jruyi-api:2.5.0'
 }
 ```
 
@@ -38,7 +38,7 @@ For Maven:
     <dependency>
         <groupId>org.jruyi</groupId>
         <artifactId>jruyi-api</artifactId>
-        <version>2.4.0</version>
+        <version>2.5.0</version>
     </dependency>
 </dependencies>
 ```
@@ -55,7 +55,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.jruyi:jruyi-api:2.5.0-SNAPSHOT'
+    compile 'org.jruyi:jruyi-api:x.y.z-SNAPSHOT'
 }
 ```
 
@@ -73,7 +73,7 @@ For Maven:
     <dependency>
         <groupId>org.jruyi</groupId>
         <artifactId>jruyi-api</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>x.y.z-SNAPSHOT</version>
     </dependency>
 </dependencies>
 ```
