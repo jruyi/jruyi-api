@@ -22,17 +22,6 @@ package org.jruyi.core;
 public interface IChannelAdminConfiguration {
 
 	/**
-	 * Configures the number of selector threads.
-	 * 
-	 * @param numberOfSelectorThreads
-	 *            the number of selector threads to configure
-	 * @return this object
-	 * @throws IllegalArgumentException
-	 *             if {@code numberOfSelectorThreads < 0}
-	 */
-	IChannelAdminConfiguration numberOfSelectorThreads(Integer numberOfSelectorThreads);
-
-	/**
 	 * Configures the number of IO threads.
 	 * 
 	 * @param numberOfIoThreads
@@ -44,36 +33,10 @@ public interface IChannelAdminConfiguration {
 	IChannelAdminConfiguration numberOfIoThreads(Integer numberOfIoThreads);
 
 	/**
-	 * Configures the capacity of the IO ring buffer.
-	 *
-	 * @param capacityOfIoRingBuffer
-	 *            the capacity of IO ring buffer to configure
-	 * @return this object
-	 * @throws IllegalArgumentException
-	 *             if {@code capacityOfIoRingBuffer < 1}
-	 */
-	IChannelAdminConfiguration capacityOfIoRingBuffer(int capacityOfIoRingBuffer);
-
-	/**
-	 * Returns the number of selector threads, or {@code null} which means the
-	 * number is calculated based on the number of CPU cores.
-	 * 
-	 * @return the number of selector threads
-	 */
-	Integer numberOfSelectorThreads();
-
-	/**
 	 * Returns the number of IO threads, or {@code null} which means the number
 	 * is calculated based on the number of CPU cores.
 	 * 
 	 * @return the number of IO threads
 	 */
 	Integer numberOfIoThreads();
-
-	/**
-	 * Returns the capacity of IO ring buffer.
-	 * 
-	 * @return the capacity of IO ring buffer
-	 */
-	int capacityOfIoRingBuffer();
 }
