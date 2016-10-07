@@ -13,7 +13,6 @@
  */
 
 plugins {
-	id "com.jfrog.artifactory" version "4.4.5"
 	id "com.jfrog.bintray" version "1.7.1"
 }
 
@@ -173,26 +172,16 @@ publishing {
 			artifact javadocJar
 		}
 	}
-}
 
-artifactory {
-	contextUrl = 'https://oss.jfrog.org/artifactory'
-	publish {
-		repository {
-			repoKey = "oss-snapshot-local"
-			username = bintrayUser
-			password = bintrayApiKey
+	repositories {
+		maven {
+			url 'https://oss.jfrog.org/artifactory/oss-snapshot-local'
+			credentials {
+				username bintrayUser
+				password bintrayApiKey
+			}
 		}
 	}
-	resolve {
-		repository {
-			repoKey = "libs-snapshot"
-		}
-	}
-}
-
-artifactoryPublish {
-	publications ('mavenJava')
 }
 
 bintray {
@@ -221,7 +210,7 @@ bintray {
 task (checkUploadTask) << {
 	def file = new File("$buildDir/.upload-task")
 	if (project.version.endsWith('-SNAPSHOT'))
-		file << 'artifactoryPublish'
+		file << 'publish'
 	else
 		file << 'bintrayUpload'
 }
