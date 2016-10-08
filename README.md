@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.jruyi:jruyi-api:2.5.0'
+    compile 'org.jruyi:jruyi-api:2.5.1'
 }
 ```
 
@@ -38,7 +38,7 @@ For Maven:
     <dependency>
         <groupId>org.jruyi</groupId>
         <artifactId>jruyi-api</artifactId>
-        <version>2.5.0</version>
+        <version>2.5.1</version>
     </dependency>
 </dependencies>
 ```

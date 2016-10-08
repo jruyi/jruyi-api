@@ -21,7 +21,7 @@ apply plugin: 'maven-publish'
 
 group = 'org.jruyi'
 archivesBaseName = 'jruyi-api'
-version = '2.5.1-SNAPSHOT'
+version = '2.5.1'
 description = 'An API lib for developing JRuyi based applications'
 
 ext {
